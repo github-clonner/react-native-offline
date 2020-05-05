@@ -1,0 +1,35 @@
+import NetInfo from '@react-native-community/netinfo';
+import checkInternetAccess from './checkInternetAccess';
+import {
+  DEFAULT_PING_SERVER_URL,
+  DEFAULT_TIMEOUT,
+  DEFAULT_HTTP_METHOD,
+} from './constants';
+import { HTTPMethod } from '../types';
+
+/**
+ * Utility that allows to query for internet connectivity on demand
+ * @param url
+ * @param timeout
+ * @param shouldPing
+ * @param method
+ * @returns {Promise<boolean>}
+ */
+export default async function checkInternetConnection(
+  url: string = DEFAULT_PING_SERVER_URL,
+  timeout: number = DEFAULT_TIMEOUT,
+  shouldPing = true,
+  method: HTTPMethod = DEFAULT_HTTP_METHOD,
+): Promise<boolean> {
+  return NetInfo.fetch().then(async connectionState => {
+    if (shouldPing) {
+      const hasInternetAccess = await checkInternetAccess({
+        timeout,
+        url,
+        method,
+      });
+      return hasInternetAccess;
+    }
+    return connectionState.isConnected;
+  });
+}
